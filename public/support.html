@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <title>Hubungi Dukungan API siputzx - Laporan Bug, Request Fitur & Tanya Jawab</title>
+    <meta name="description" content="Butuh bantuan? Hubungi tim dukungan API siputzx untuk request fitur, melaporkan bug, atau bertanya soal integrasi REST API kami." />
+    <meta name="keywords" content="dukungan api, api support, kontak api, bug report api, request fitur api, tanya jawab api, api gratis indonesia, bantuan teknis, laporan fitur rusak, rest api siputzx, api helpdesk" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="author" content="siputzx" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="google" content="notranslate" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="alternate" href="https://api.siputzx.my.id/support" hreflang="id-ID" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Dukungan API siputzx - Laporan & Permintaan Fitur" />
+    <meta property="og:description" content="Laporkan bug, minta fitur baru, atau ajukan pertanyaan terkait penggunaan API siputzx melalui halaman dukungan resmi kami." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://api.siputzx.my.id/support" />
+    <meta property="og:site_name" content="API siputzx" />
+    <meta property="og:locale" content="id_ID" />
+    <meta property="og:image" content="https://api.siputzx.my.id/images/support-og.png" />
+    <meta property="og:image:alt" content="Halaman Dukungan API siputzx" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Dukungan Resmi API siputzx - Hubungi Kami Sekarang" />
+    <meta name="twitter:description" content="Laporkan fitur rusak, request fitur baru, atau dapatkan bantuan dari tim support API siputzx." />
+    <meta name="twitter:image" content="https://api.siputzx.my.id/images/support-twitter.png" />
+    <meta name="twitter:creator" content="@siputzx" />
+    <meta name="twitter:site" content="@siputzx" />
+
+    <!-- Schema.org: Contact Page -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": "Dukungan API siputzx",
+      "url": "https://api.siputzx.my.id/support",
+      "description": "Halaman dukungan API siputzx untuk melaporkan bug, request fitur, dan bertanya tentang layanan REST API.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "siputzx",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://api.siputzx.my.id/images/logo.png"
+        }
+      },
+      "mainEntity": {
+        "@type": "ContactPoint",
+        "contactType": "technical support",
+        "email": "support@siputzx.my.id",
+        "availableLanguage": ["Indonesian", "English"]
+      }
+    }
+    </script>
+
+    <!-- BreadcrumbList -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://api.siputzx.my.id"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Support",
+          "item": "https://api.siputzx.my.id/support"
+        }
+      ]
+    }
+    </script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback" async defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+    <link href="/assets/css/main.css" rel="stylesheet" />
+    
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      
+      .input-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+      }
+      
+      .input-group input,
+      .input-group select,
+      .input-group textarea {
+        width: 100%;
+        padding: 0.8rem;
+        border: 1px solid #334155;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 0.5rem;
+        transition: all 0.3s;
+        outline: none;
+        font-size: 0.95rem;
+        color: #e2e8f0;
+      }
+      
+      .input-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #94a3b8;
+        font-weight: 500;
+      }
+      
+      .input-group input:focus,
+      .input-group select:focus,
+      .input-group textarea:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+      }
+      
+      select {
+        appearance: none;
+        cursor: pointer;
+      }
+      
+      .submit-btn {
+        transition: all 0.3s;
+        background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        color: white;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+      }
+      
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar fixed w-full z-50">
+      <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <span class="text-lg font-bold gradient-text">siputzx API</span>
+          </div>
+          
+          <!-- Desktop Navigation -->
+          <div class="hidden md:flex items-center space-x-8">
+            <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
+            <a href="/get/documentation" class="text-gray-300 hover:text-white transition-colors">GET Docs</a>
+            <a href="/post/documentation" class="text-gray-300 hover:text-white transition-colors">POST Docs</a>
+            <a href="/monitor" class="text-gray-300 hover:text-white transition-colors">Status</a>
+            <a href="/donasi" class="text-gray-300 hover:text-white transition-colors">Donate</a>
+          </div>
+          
+          <!-- Mobile menu button -->
+          <div class="md:hidden">
+            <button id="mobile-menu-button" class="text-gray-300 hover:text-white">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Mobile Navigation -->
+      <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-t border-gray-800">
+        <div class="container mx-auto px-4 py-3 space-y-2">
+          <a href="/" class="block py-2 text-gray-300 hover:text-white">Home</a>
+          <a href="/get/documentation" class="block py-2 text-gray-300 hover:text-white">GET Docs</a>
+          <a href="/post/documentation" class="block py-2 text-gray-300 hover:text-white">POST Docs</a>
+          <a href="/monitor" class="block py-2 text-gray-300 hover:text-white">Status</a>
+          <a href="/donasi" class="block py-2 text-gray-300 hover:text-white">Donate</a>
+        </div>
+      </div>
+    </nav>
+    
+    <div class="min-h-screen flex items-center justify-center px-4 pt-20">
+      <div class="w-full max-w-md">
+        <form id="supportForm" class="space-y-6 glass-effect p-8 rounded-lg">
+          <div class="text-center mb-10">
+            <h1 class="text-2xl font-light">Support</h1>
+          </div>
+
+          <div class="input-group">
+            <label for="requestType">Request Type</label>
+            <select id="requestType" required>
+              <option value="">Select Type</option>
+              <option value="feature">Feature Request</option>
+              <option value="complaint">Report Issue</option>
+              <option value="feedback">Feedback</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" required placeholder="Your name" />
+          </div>
+
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" required placeholder="your.email@example.com" />
+          </div>
+
+          <div class="input-group">
+            <label for="whatsapp">WhatsApp (Optional)</label>
+            <input type="tel" id="whatsapp" placeholder="6281234567890" />
+          </div>
+
+          <div id="dynamicFields"></div>
+
+          <div class="flex justify-center">
+            <div id="turnstile-container"></div>
+          </div>
+
+          <button type="submit" class="submit-btn w-full">
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const dynamicFields = {
+        feature: `
+                <div class="input-group">
+                    <label for="featureName">Feature Name</label>
+                    <input type="text" id="featureName" required placeholder="Name of the feature you're requesting" />
+                </div>
+                <div class="input-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" required placeholder="Describe the feature you'd like to see..." rows="4"></textarea>
+                </div>
+            `,
+        complaint: `
+                <div class="input-group">
+                    <label for="featureName">API Feature</label>
+                    <input type="text" id="featureName" required placeholder="Which API feature has an issue?" />
+                </div>
+                <div class="input-group">
+                    <label for="description">Issue Details</label>
+                    <textarea id="description" required placeholder="Describe the issue you're experiencing..." rows="4"></textarea>
+                </div>
+            `,
+        feedback: `
+                <div class="input-group">
+                    <label for="description">Feedback</label>
+                    <textarea id="description" required placeholder="Share your feedback with us..." rows="4"></textarea>
+                </div>
+            `,
+      }
+
+      let turnstileWidget
+
+      window.onloadTurnstileCallback = function () {
+        turnstileWidget = turnstile.render('#turnstile-container', {
+          sitekey: '0x4AAAAAAA6dZGHl6b5dKTOR',
+          theme: 'dark',
+        })
+      }
+
+      document
+        .getElementById('requestType')
+        .addEventListener('change', function (e) {
+          const type = e.target.value
+          document.getElementById('dynamicFields').innerHTML = type
+            ? dynamicFields[type]
+            : ''
+        })
+
+      document
+        .getElementById('supportForm')
+        .addEventListener('submit', async (e) => {
+          e.preventDefault()
+
+          const token = turnstile.getResponse(turnstileWidget)
+          if (!token) {
+            Swal.fire({
+              text: 'Please complete verification',
+              icon: 'info',
+              showConfirmButton: false,
+              timer: 1500,
+            })
+            return
+          }
+
+          try {
+            Swal.fire({
+              text: 'Sending...',
+              allowOutsideClick: false,
+              showConfirmButton: false,
+              didOpen: () => Swal.showLoading(),
+            })
+
+            const formData = {
+              type: document.getElementById('requestType').value,
+              name: document.getElementById('name').value,
+              email: document.getElementById('email').value,
+              whatsapp: document.getElementById('whatsapp').value || null,
+              featureName: document.getElementById('featureName')?.value,
+              description: document.getElementById('description')?.value,
+              token,
+            }
+
+            const response = await fetch('/api/support', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(formData),
+            })
+
+            const result = await response.json()
+
+            if (result.success) {
+              Swal.fire({
+                text: 'Sent successfully!',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500,
+              })
+              e.target.reset()
+              document.getElementById('dynamicFields').innerHTML = ''
+              turnstile.reset(turnstileWidget)
+            } else {
+              throw new Error(result.error || 'Failed to send')
+            }
+          } catch (error) {
+            Swal.fire({
+              text: error.message,
+              icon: 'error',
+              showConfirmButton: false,
+              timer: 1500,
+            })
+          }
+        })
+    </script>
+    
+    <!-- Footer -->
+    <footer class="footer text-white py-12 mt-16">
+      <div class="container mx-auto px-4">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div class="space-y-6">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <span class="font-bold text-xl gradient-text">siputzx API</span>
+            </div>
+            <p class="text-gray-400 text-base leading-relaxed">
+              Building the future of API development with modern solutions and cutting-edge technology.
+            </p>
+            <div class="flex space-x-4">
+              <a href="https://github.com/siputzx-production" class="w-10 h-10 rounded-lg bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-300">
+                <i class="ri-github-fill text-xl"></i>
+              </a>
+              <a href="https://www.instagram.com/siputzx" class="w-10 h-10 rounded-lg bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-300">
+                <i class="ri-instagram-fill text-xl"></i>
+              </a>
+              <a href="https://www.linkedin.com/in/siputzx" class="w-10 h-10 rounded-lg bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-300">
+                <i class="ri-linkedin-fill text-xl"></i>
+              </a>
+            </div>
+          </div>
+          
+          <div>
+            <h4 class="text-base font-bold uppercase tracking-wider mb-6 text-white">Support</h4>
+            <ul class="space-y-3">
+              <li><a href="https://wa.me/message/62CFNJ5W3OG5H1" class="text-gray-400 hover:text-white transition-colors duration-300">Help Center</a></li>
+              <li><a href="https://whatsapp.com/channel/0029Vaq9pCUEawdzlDYdYF3p" class="text-gray-400 hover:text-white transition-colors duration-300">Community</a></li>
+              <li><a href="/support" class="text-gray-400 hover:text-white transition-colors duration-300">Support</a></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 class="text-base font-bold uppercase tracking-wider mb-6 text-white">Other</h4>
+            <ul class="space-y-3">
+              <li><a href="/monitor" class="text-gray-400 hover:text-white transition-colors duration-300">Statistics</a></li>
+              <li><a href="/donasi" class="text-gray-400 hover:text-white transition-colors duration-300">Donation</a></li>
+              <li><a href="/contributor" class="text-gray-400 hover:text-white transition-colors duration-300">Contribution</a></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 class="text-base font-bold uppercase tracking-wider mb-6 text-white">Legal</h4>
+            <ul class="space-y-3">
+              <li><a href="https://www.termsfeed.com/live/dff573c8-790f-4132-8faf-01c887331e1b" class="text-gray-400 hover:text-white transition-colors duration-300">Privacy Policy</a></li>
+              <li><a href="/tos" class="text-gray-400 hover:text-white transition-colors duration-300">Terms of Service</a></li>
+              <li><a href="https://www.cisa.gov/" class="text-gray-400 hover:text-white transition-colors duration-300">Security</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="border-t border-gray-800/50 mt-12 pt-8 text-center">
+          <p class="text-gray-400">
+            © 2024 Siputzx API. All rights reserved. Built with ❤️ for developers.
+          </p>
+        </div>
+      </div>
+    </footer>
+    
+    <script src="/assets/js/main.js"></script>
+  </body>
+</html>

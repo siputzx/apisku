@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  
+  <!-- SEO Meta Tags (To be customized per page) -->
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}" />
+  <meta name="keywords" content="{{keywords}}" />
+  <meta name="author" content="siputzx" />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="manifest" href="/site.webmanifest" />
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
+  
+  <!-- CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet" />
+  <link href="/assets/css/main.css" rel="stylesheet" />
+  
+  <!-- AOS Animation Library -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet" />
+</head>
+<body class="bg-slate-900">
+  <!-- Navbar -->
+  {{navbar}}
+  
+  <!-- Main Content -->
+  <main class="pt-16">
+    {{content}}
+  </main>
+  
+  <!-- Footer -->
+  {{footer}}
+  
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script src="/assets/js/main.js"></script>
+  
+  <!-- Page-specific scripts -->
+  {{scripts}}
+</body>
+</html>

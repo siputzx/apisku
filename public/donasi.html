@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  
+  <title>Dukungan & Donasi untuk API siputzx - Bantu Kami Tetap Gratis!</title>
+  <meta name="description" content="Dukung pengembangan API siputzx melalui donasi. Bantuan Anda membantu kami menyediakan layanan REST API gratis, cepat, dan handal untuk developer Indonesia." />
+  <meta name="keywords" content="donasi api siputzx, dukungan api, bantu api gratis, kontribusi developer, rest api indonesia, api gratis indonesia, support api, kontribusi komunitas, donasi developer" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="author" content="siputzx" />
+  <meta name="googlebot" content="index, follow" />
+  <meta name="google" content="notranslate" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="alternate" href="https://api.siputzx.my.id/donasi" hreflang="id-ID" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Donasi untuk API siputzx - Dukung API Gratis untuk Developer" />
+  <meta property="og:description" content="Bantu menjaga layanan API siputzx tetap berjalan. Donasi Anda sangat berarti bagi komunitas developer Indonesia." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://api.siputzx.my.id/donasi" />
+  <meta property="og:site_name" content="API siputzx" />
+  <meta property="og:locale" content="id_ID" />
+  <meta property="og:image" content="https://api.siputzx.my.id/images/donasi-og.png" />
+  <meta property="og:image:alt" content="Ilustrasi Donasi API siputzx" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Donasi API siputzx - Dukung Developer Indonesia" />
+  <meta name="twitter:description" content="Donasi Anda membantu API siputzx tetap tersedia secara gratis untuk seluruh developer di Indonesia." />
+  <meta name="twitter:image" content="https://api.siputzx.my.id/images/donasi-twitter.png" />
+  <meta name="twitter:creator" content="@siputzx" />
+  <meta name="twitter:site" content="@siputzx" />
+
+  <!-- Schema.org: DonateAction -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "DonateAction",
+    "name": "Donasi untuk API siputzx",
+    "target": "https://api.siputzx.my.id/donasi",
+    "description": "Dukung pengembangan dan pemeliharaan layanan REST API gratis untuk developer Indonesia.",
+    "recipient": {
+      "@type": "Organization",
+      "name": "siputzx",
+      "url": "https://api.siputzx.my.id",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://api.siputzx.my.id/images/logo.png"
+      }
+    }
+  }
+  </script>
+
+  <!-- BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://api.siputzx.my.id"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Donasi",
+        "item": "https://api.siputzx.my.id/donasi"
+      }
+    ]
+  }
+  </script>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
+  <link href="/assets/css/main.css" rel="stylesheet" />
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="https://app.midtrans.com/snap/snap.js" data-client-key="Mid-client-N95EuTZMbqCa2MPa"></script>
+</head>
+<body class="bg-slate-900">
+  <!-- Navbar -->
+  <nav class="navbar fixed w-full z-50">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <span class="text-lg font-bold gradient-text">siputzx API</span>
+        </div>
+        
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
+          <a href="/get-docs.html" class="text-gray-300 hover:text-white transition-colors">GET Docs</a>
+          <a href="/post-docs.html" class="text-gray-300 hover:text-white transition-colors">POST Docs</a>
+          <a href="/stat.html" class="text-gray-300 hover:text-white transition-colors">Status</a>
+          <a href="/donasi.html" class="text-gray-300 hover:text-white transition-colors">Donate</a>
+        </div>
+        
+        <!-- Mobile menu button -->
+        <div class="md:hidden">
+          <button id="mobile-menu-button" class="text-gray-300 hover:text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Mobile Navigation -->
+    <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-t border-gray-800">
+      <div class="container mx-auto px-4 py-3 space-y-2">
+        <a href="/" class="block py-2 text-gray-300 hover:text-white">Home</a>
+        <a href="/get-docs.html" class="block py-2 text-gray-300 hover:text-white">GET Docs</a>
+        <a href="/post-docs.html" class="block py-2 text-gray-300 hover:text-white">POST Docs</a>
+        <a href="/stat.html" class="block py-2 text-gray-300 hover:text-white">Status</a>
+        <a href="/donasi.html" class="block py-2 text-gray-300 hover:text-white">Donate</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="min-h-screen pt-24 pb-16 flex items-center justify-center">
+    <div class="container mx-auto px-4 max-w-4xl">
+      <div class="text-center mb-12">
+        <h1 class="text-3xl md:text-4xl font-bold mb-4">Dukung Kami</h1>
+        <p class="text-gray-400 max-w-xl mx-auto">Setiap donasi Anda membantu kami menjaga layanan API gratis ini tetap berjalan dan berkembang.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="glass-card p-8 rounded-2xl">
+          <h2 class="text-xl font-semibold mb-6">Form Donasi</h2>
+          <form id="donation-form" class="space-y-6">
+            <div>
+              <label for="name" class="block text-sm font-medium mb-2">Nama</label>
+              <input type="text" id="name" name="name" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white input-focus" required />
+            </div>
+            <div>
+              <label for="email" class="block text-sm font-medium mb-2">Email</label>
+              <input type="email" id="email" name="email" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white input-focus" required />
+            </div>
+            <div>
+              <label for="amount" class="block text-sm font-medium mb-2">Jumlah Donasi (Rp)</label>
+              <input type="number" id="amount" name="amount" min="1000" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white input-focus" required placeholder="Minimal Rp1.000" />
+            </div>
+            <div>
+              <label for="comment" class="block text-sm font-medium mb-2">Komentar (Opsional)</label>
+              <textarea id="comment" name="comment" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white input-focus" rows="3" placeholder="Tinggalkan pesan dukungan..."></textarea>
+            </div>
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAAA6dZGHl6b5dKTOR"></div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 glow-effect">Donasi Sekarang</button>
+          </form>
+        </div>
+        <div>
+          <h2 class="text-xl font-semibold mb-6">Daftar Donatur</h2>
+          <div id="donation-list" class="space-y-4 max-h-[400px] overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer text-white py-12">
+    <div class="container mx-auto px-4">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="space-y-6">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <span class="font-bold text-xl gradient-text">siputzx API</span>
+          </div>
+          <p class="text-gray-400 text-base leading-relaxed">
+            Building the future of API development with modern solutions and cutting-edge technology.
+          </p>
+          <div class="flex space-x-4">
+            <a href="https://github.com/siputzx-production" class="w-10 h-10 rounded-lg bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-300">
+              <i class="ri-github-fill text-xl"></i>
+            </a>
+            <a href="https://www.instagram.com/siputzx" class="w-10 h-10 rounded-lg bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-300">
+              <i class="ri-instagram-fill text-xl"></i>
+            </a>
+            <a href="https://www.linkedin.com/in/siputzx" class="w-10 h-10 rounded-lg bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-300">
+              <i class="ri-linkedin-fill text-xl"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="text-base font-bold uppercase tracking-wider mb-6 text-white">Support</h4>
+          <ul class="space-y-3">
+            <li><a href="https://wa.me/message/62CFNJ5W3OG5H1" class="text-gray-400 hover:text-white transition-colors duration-300">Help Center</a></li>
+            <li><a href="https://whatsapp.com/channel/0029Vaq9pCUEawdzlDYdYF3p" class="text-gray-400 hover:text-white transition-colors duration-300">Community</a></li>
+            <li><a href="/support.html" class="text-gray-400 hover:text-white transition-colors duration-300">Support</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-base font-bold uppercase tracking-wider mb-6 text-white">Other</h4>
+          <ul class="space-y-3">
+            <li><a href="/stat.html" class="text-gray-400 hover:text-white transition-colors duration-300">Statistics</a></li>
+            <li><a href="/donasi.html" class="text-gray-400 hover:text-white transition-colors duration-300">Donation</a></li>
+            <li><a href="/contributor.html" class="text-gray-400 hover:text-white transition-colors duration-300">Contribution</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-base font-bold uppercase tracking-wider mb-6 text-white">Legal</h4>
+          <ul class="space-y-3">
+            <li><a href="https://www.termsfeed.com/live/dff573c8-790f-4132-8faf-01c887331e1b" class="text-gray-400 hover:text-white transition-colors duration-300">Privacy Policy</a></li>
+            <li><a href="/tos.html" class="text-gray-400 hover:text-white transition-colors duration-300">Terms of Service</a></li>
+            <li><a href="https://www.cisa.gov/" class="text-gray-400 hover:text-white transition-colors duration-300">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800/50 mt-12 pt-8 text-center">
+        <p class="text-gray-400">
+          © 2024 Siputzx API. All rights reserved. Built with ❤️ for developers.
+        </p>
+      </div>
+    </div>
+  </footer>
+  
+  <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/donasi.js"></script>
+</body>
+</html>

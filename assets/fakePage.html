@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+</head>
+<body>
+    <div class="turnstile"></div>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback" defer></script>
+    <script>
+        window.onloadTurnstileCallback = function () {
+            turnstile.render('.turnstile', {
+                sitekey: '<site-key>',
+                callback: function (token) {
+                    var c = document.createElement('input');
+                    c.type = 'hidden';
+                    c.name = 'cf-response';
+                    c.value = token;
+                    document.body.appendChild(c);
+                },
+            });
+        };
+    </script>
+</body>
+</html>

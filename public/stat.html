@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Status Layanan API siputzx - Monitoring Realtime REST API</title>
+  <meta name="description" content="Monitoring status layanan REST API siputzx secara realtime. Dapatkan informasi terbaru tentang uptime, waktu respon, dan statistik penggunaan." />
+  <meta name="keywords" content="status api, monitoring api, uptime api, api status page, rest api monitoring, api performance, api siputzx status, status layanan api" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="siputzx" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="alternate" href="https://api.siputzx.my.id/stat" hreflang="id-ID" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Status Layanan & Monitoring Realtime API siputzx" />
+  <meta property="og:description" content="Monitoring status layanan REST API siputzx secara realtime. Dapatkan informasi terbaru tentang uptime, waktu respon, dan statistik penggunaan." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://api.siputzx.my.id/stat" />
+  <meta property="og:site_name" content="API siputzx" />
+  <meta property="og:image" content="https://api.siputzx.my.id/images/status-og.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Status & Monitoring API siputzx" />
+  <meta name="twitter:description" content="Lihat status realtime dari layanan REST API siputzx, termasuk uptime, performa, dan statistik." />
+  <meta name="twitter:image" content="https://api.siputzx.my.id/images/status-twitter.png" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="/assets/css/main.css" rel="stylesheet" />
+</head>
+<body class="bg-slate-900">
+  <!-- Navbar -->
+  <nav class="navbar fixed w-full z-50">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <span class="text-lg font-bold gradient-text">siputzx API</span>
+        </div>
+        
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
+          <a href="/get-docs.html" class="text-gray-300 hover:text-white transition-colors">GET Docs</a>
+          <a href="/post-docs.html" class="text-gray-300 hover:text-white transition-colors">POST Docs</a>
+          <a href="/stat.html" class="text-gray-300 hover:text-white transition-colors">Status</a>
+          <a href="/donasi.html" class="text-gray-300 hover:text-white transition-colors">Donate</a>
+        </div>
+        
+        <!-- Mobile menu button -->
+        <div class="md:hidden">
+          <button id="mobile-menu-button" class="text-gray-300 hover:text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Mobile Navigation -->
+    <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-t border-gray-800">
+      <div class="container mx-auto px-4 py-3 space-y-2">
+        <a href="/" class="block py-2 text-gray-300 hover:text-white">Home</a>
+        <a href="/get-docs.html" class="block py-2 text-gray-300 hover:text-white">GET Docs</a>
+        <a href="/post-docs.html" class="block py-2 text-gray-300 hover:text-white">POST Docs</a>
+        <a href="/stat.html" class="block py-2 text-gray-300 hover:text-white">Status</a>
+        <a href="/donasi.html" class="block py-2 text-gray-300 hover:text-white">Donate</a>
+      </div>
+    </div>
+  </nav>
+  
+  <main class="container mx-auto px-4 pt-24 pb-16">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-8 gap-4">
+          <div>
+            <h1 class="text-2xl md:text-4xl font-bold gradient-text mb-2 floating">API Monitoring</h1>
+            <p class="text-gray-400 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 live-indicator"></span>Live Dashboard
+            </p>
+          </div>
+          <div class="text-sm text-gray-400 glass-effect px-4 py-2 rounded-lg" id="currentTime"></div>
+        </div>
+
+        <!-- Enhanced Metrics Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+          <div class="metric-card glass-effect rounded-2xl p-4 md:p-6">
+            <div class="glow"></div>
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-medium text-gray-400 mb-1">Total Requests</h3>
+                <p class="text-xl md:text-2xl font-bold text-white" id="totalRequests">0</p>
+              </div>
+              <div class="card-icon text-sky-500 bg-sky-500/10 p-3 md:p-4 rounded-xl">
+                <i class="ri-network-wired-fill text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <div class="metric-card glass-effect rounded-2xl p-4 md:p-6">
+            <div class="glow"></div>
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-medium text-gray-400 mb-1">Daily Requests</h3>
+                <p class="text-xl md:text-2xl font-bold text-white" id="dailyRequests">0</p>
+              </div>
+              <div class="card-icon text-violet-500 bg-violet-500/10 p-3 md:p-4 rounded-xl">
+                <i class="ri-time-line text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <div class="metric-card glass-effect rounded-2xl p-4 md:p-6">
+            <div class="glow"></div>
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-medium text-gray-400 mb-1">Requests/Second</h3>
+                <p class="text-xl md:text-2xl font-bold text-white" id="requestsPerSecond">0</p>
+              </div>
+              <div class="card-icon text-emerald-500 bg-emerald-500/10 p-3 md:p-4 rounded-xl">
+                <i class="ri-speed-line text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <div class="metric-card glass-effect rounded-2xl p-4 md:p-6">
+            <div class="glow"></div>
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-medium text-gray-400 mb-1">Total Fitur</h3>
+                <p class="text-xl md:text-2xl font-bold text-white" id="totalEndpoints">-</p>
+              </div>
+              <div class="card-icon text-amber-500 bg-amber-500/10 p-3 md:p-4 rounded-xl">
+                <i class="ri-apps-line text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <div class="metric-card glass-effect rounded-2xl p-4 md:p-6">
+            <div class="glow"></div>
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-medium text-gray-400 mb-1">API Total</h3>
+                <p class="text-xl md:text-2xl font-bold text-white" id="apiTotalRequests">0</p>
+              </div>
+              <div class="card-icon text-indigo-500 bg-indigo-500/10 p-3 md:p-4 rounded-xl">
+                <i class="ri-server-line text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <div class="metric-card glass-effect rounded-2xl p-4 md:p-6">
+            <div class="glow"></div>
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-medium text-gray-400 mb-1">CPU Usage</h3>
+                <p class="text-xl md:text-2xl font-bold text-white" id="cpuUsage">0%</p>
+              </div>
+              <div class="card-icon text-red-500 bg-red-500/10 p-3 md:p-4 rounded-xl">
+                <i class="ri-cpu-line text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <div class="metric-card glass-effect rounded-2xl p-4 md:p-6">
+            <div class="glow"></div>
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-medium text-gray-400 mb-1">Network Down</h3>
+                <p class="text-xl md:text-2xl font-bold text-white" id="networkDown">0 MB/s</p>
+              </div>
+              <div class="card-icon text-cyan-500 bg-cyan-500/10 p-3 md:p-4 rounded-xl">
+                <i class="ri-download-line text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <div class="metric-card glass-effect rounded-2xl p-4 md:p-6">
+            <div class="glow"></div>
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-medium text-gray-400 mb-1">Network Up</h3>
+                <p class="text-xl md:text-2xl font-bold text-white" id="networkUp">0 KB/s</p>
+              </div>
+              <div class="card-icon text-orange-500 bg-orange-500/10 p-3 md:p-4 rounded-xl">
+                <i class="ri-upload-line text-xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent API Requests Section -->
+        <div class="glass-effect rounded-2xl p-4 md:p-6 mb-6 md:mb-8">
+          <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <i class="ri-time-line text-emerald-500"></i>
+            Recent API Requests (Last 5)
+            <span class="text-sm glass-effect px-2 py-1 rounded-lg ml-auto">Real-time</span>
+          </h2>
+          <div id="recentRequestsList" class="space-y-2">
+            <!-- Recent API requests will be populated here -->
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+          <div class="glass-effect rounded-2xl p-4 md:p-6 chart-container">
+            <h2 class="text-lg font-semibold text-white mb-4">Request History (Last 10 Days)</h2>
+            <div class="history-chart">
+              <canvas id="historyChart"></canvas>
+            </div>
+          </div>
+          <div class="glass-effect rounded-2xl p-4 md:p-6 chart-container">
+            <h2 class="text-lg font-semibold text-white mb-4">Network Usage</h2>
+            <div class="chart-wrapper">
+              <canvas id="networkChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Enhanced Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+          <div class="glass-effect rounded-2xl p-4 md:p-6 chart-container">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+              <h2 class="text-lg font-semibold text-white">System Performance</h2>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="systemChart"></canvas>
+            </div>
+          </div>
+          <div class="glass-effect rounded-2xl p-4 md:p-6 chart-container">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-lg font-semibold text-white">Request Rate</h2>
+              <div class="text-sm glass-effect px-3 py-1 rounded-lg">
+                <i class="ri-line-chart-line mr-2" style="color:#f85149"></i>Real-time
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="requestChart"></canvas>
+            </div>
+          </div>
+          <div class="glass-effect rounded-2xl p-4 md:p-6 chart-container">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-lg font-semibold text-white">Avg Response Time</h2>
+              <div class="text-sm glass-effect px-3 py-1 rounded-lg">
+                <i class="ri-timer-line mr-2" style="color:#f472b6"></i>Real-time
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="responseChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Enhanced Stats Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+          <div class="glass-effect rounded-2xl p-4 md:p-6">
+            <h2 class="text-lg font-semibold text-white mb-4">Response Time Distribution</h2>
+            <div class="chart-wrapper">
+              <canvas id="responseDistChart"></canvas>
+            </div>
+          </div>
+          <div class="glass-effect rounded-2xl p-4 md:p-6">
+            <h2 class="text-lg font-semibold text-white mb-4">Top User Agents</h2>
+            <div id="userAgentStats" class="space-y-3">
+              <!-- User agent stats will be populated here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Request Methods Section -->
+        <div class="glass-effect rounded-2xl p-4 md:p-6 mb-6 md:mb-8">
+          <h2 class="text-lg font-semibold text-white mb-4">Request Methods Distribution</h2>
+          <div class="chart-wrapper">
+            <canvas id="methodChart"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-effect rounded-2xl p-4 md:p-6 mt-6 md:mt-8">
+          <h2 class="text-lg font-semibold text-white mb-4">API Usage Ranking (Last 24 Hours)</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-gray-400">
+              <thead>
+                <tr>
+                  <th class="px-4 py-2 text-left">Rank</th>
+                  <th class="px-4 py-2 text-left">Endpoint</th>
+                  <th class="px-4 py-2 text-left">Total Requests</th>
+                  <th class="px-4 py-2 text-left">Success</th>
+                  <th class="px-4 py-2 text-left">Errors</th>
+                  <th class="px-4 py-2 text-left">Avg Response (ms)</th>
+                  <th class="px-4 py-2 text-left">Error Rate</th>
+                  <th class="px-4 py-2 text-left">Success Rate</th>
+                </tr>
+              </thead>
+              <tbody id="apiTableBody"></tbody>
+            </table>
+          </div>
+          <div class="flex justify-between items-center mt-4">
+            <button id="prevPage" class="pagination-btn glass-effect px-4 py-2 rounded-lg text-white disabled:opacity-50">
+              <i class="ri-arrow-left-line mr-2"></i>Previous
+            </button>
+            <span id="pageInfo" class="text-gray-400"></span>
+            <button id="nextPage" class="pagination-btn glass-effect px-4 py-2 rounded-lg text-white disabled:opacity-50">
+              Next<i class="ri-arrow-right-line ml-2"></i>
+            </button>
+          </div>
+        </div>
+    </div>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="footer text-white py-12 mt-16">
+    <div class="container mx-auto px-4">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="space-y-6">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <span class="font-bold text-xl gradient-text">siputzx API</span>
+          </div>
+          <p class="text-gray-400 text-base leading-relaxed">
+            Building the future of API development with modern solutions and cutting-edge technology.
+          </p>
+          <div class="flex space-x-4">
+            <a href="https://github.com/siputzx-production" class="w-10 h-10 rounded-lg bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-300">
+              <i class="ri-github-fill text-xl"></i>
+            </a>
+            <a href="https://www.instagram.com/siputzx" class="w-10 h-10 rounded-lg bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-300">
+              <i class="ri-instagram-fill text-xl"></i>
+            </a>
+            <a href="https://www.linkedin.com/in/siputzx" class="w-10 h-10 rounded-lg bg-gray-800/50 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-300">
+              <i class="ri-linkedin-fill text-xl"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="text-base font-bold uppercase tracking-wider mb-6 text-white">Support</h4>
+          <ul class="space-y-3">
+            <li><a href="https://wa.me/message/62CFNJ5W3OG5H1" class="text-gray-400 hover:text-white transition-colors duration-300">Help Center</a></li>
+            <li><a href="https://whatsapp.com/channel/0029Vaq9pCUEawdzlDYdYF3p" class="text-gray-400 hover:text-white transition-colors duration-300">Community</a></li>
+            <li><a href="/support.html" class="text-gray-400 hover:text-white transition-colors duration-300">Support</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-base font-bold uppercase tracking-wider mb-6 text-white">Other</h4>
+          <ul class="space-y-3">
+            <li><a href="/stat.html" class="text-gray-400 hover:text-white transition-colors duration-300">Statistics</a></li>
+            <li><a href="/donasi.html" class="text-gray-400 hover:text-white transition-colors duration-300">Donation</a></li>
+            <li><a href="/contributor.html" class="text-gray-400 hover:text-white transition-colors duration-300">Contribution</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-base font-bold uppercase tracking-wider mb-6 text-white">Legal</h4>
+          <ul class="space-y-3">
+            <li><a href="https://www.termsfeed.com/live/dff573c8-790f-4132-8faf-01c887331e1b" class="text-gray-400 hover:text-white transition-colors duration-300">Privacy Policy</a></li>
+            <li><a href="/tos.html" class="text-gray-400 hover:text-white transition-colors duration-300">Terms of Service</a></li>
+            <li><a href="https://www.cisa.gov/" class="text-gray-400 hover:text-white transition-colors duration-300">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800/50 mt-12 pt-8 text-center">
+        <p class="text-gray-400">
+          © 2024 Siputzx API. All rights reserved. Built with ❤️ for developers.
+        </p>
+      </div>
+    </div>
+  </footer>
+  
+  <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/stat.js"></script>
+</body>
+</html>

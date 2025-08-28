@@ -1,0 +1,47 @@
+<!-- 
+  Navbar Component
+  Reusable navigation bar for all pages
+-->
+<nav class="navbar fixed w-full z-50">
+  <div class="container mx-auto px-4">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </div>
+        <span class="text-lg font-bold gradient-text">siputzx API</span>
+      </div>
+      
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex items-center space-x-8">
+        <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
+        <a href="/get/documentation" class="text-gray-300 hover:text-white transition-colors">GET Docs</a>
+        <a href="/post/documentation" class="text-gray-300 hover:text-white transition-colors">POST Docs</a>
+        <a href="/monitor" class="text-gray-300 hover:text-white transition-colors">Status</a>
+        <a href="/donasi" class="text-gray-300 hover:text-white transition-colors">Donate</a>
+      </div>
+      
+      <!-- Mobile menu button -->
+      <div class="md:hidden">
+        <button id="mobile-menu-button" class="text-gray-300 hover:text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Mobile Navigation -->
+  <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-t border-gray-800">
+    <div class="container mx-auto px-4 py-3 space-y-2">
+      <a href="/" class="block py-2 text-gray-300 hover:text-white">Home</a>
+      <a href="/get/documentation" class="block py-2 text-gray-300 hover:text-white">GET Docs</a>
+      <a href="/post/documentation" class="block py-2 text-gray-300 hover:text-white">POST Docs</a>
+      <a href="/monitor" class="block py-2 text-gray-300 hover:text-white">Status</a>
+      <a href="/donasi" class="block py-2 text-gray-300 hover:text-white">Donate</a>
+    </div>
+  </div>
+</nav>
