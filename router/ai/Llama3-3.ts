@@ -8,7 +8,7 @@ export default [
     category: "AI",
     description: "This API endpoint provides access to the Llama 3.3 AI model, allowing users to generate responses by providing a system prompt and user text via query parameters. It is ideal for building conversational AI, content generation tools, or integrating advanced natural language understanding into applications. The 'prompt' parameter defines the AI's role or initial instructions, while the 'text' parameter is the actual user input the AI will respond to. The response will be the AI's generated message.",
     tags: ["AI", "Llama", "Natural Language Processing", "Generative AI", "Chatbot"],
-    example: "?prompt=Be%20a%20helpful%20assistant&text=hi",
+    example: "?prompt=Be%20a%20helpful%20assistant&text=hai",
     parameters: [
       {
         name: "prompt",
