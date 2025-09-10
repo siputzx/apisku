@@ -75,6 +75,93 @@ private setupMiddleware(): void {
      }))
     .use(staticPlugin({ assets: "public", prefix: "/"}))
     .use(staticPlugin({ assets: "tmp", prefix: "/tmpfiles" }))
+    // Block direct access to sensitive directories
+    .get("/router/*", ({ set }) => {
+      set.status = 403
+      return new Response("403 - Forbidden: Direct access to source code is not allowed", {
+        status: 403,
+        headers: { "Content-Type": "text/plain" },
+      })
+    })
+    .post("/router/*", ({ set }) => {
+      set.status = 403
+      return new Response("403 - Forbidden: Direct access to source code is not allowed", {
+        status: 403,
+        headers: { "Content-Type": "text/plain" },
+      })
+    })
+    .get("/src/*", ({ set }) => {
+      set.status = 403
+      return new Response("403 - Forbidden: Direct access to source code is not allowed", {
+        status: 403,
+        headers: { "Content-Type": "text/plain" },
+      })
+    })
+    .post("/src/*", ({ set }) => {
+      set.status = 403
+      return new Response("403 - Forbidden: Direct access to source code is not allowed", {
+        status: 403,
+        headers: { "Content-Type": "text/plain" },
+      })
+    })
+    // Block access to configuration files
+    .get("/*.env*", ({ set }) => {
+      set.status = 403
+      return new Response("403 - Forbidden: Access to configuration files is not allowed", {
+        status: 403,
+        headers: { "Content-Type": "text/plain" },
+      })
+    })
+    .post("/*.env*", ({ set }) => {
+      set.status = 403
+      return new Response("403 - Forbidden: Access to configuration files is not allowed", {
+        status: 403,
+        headers: { "Content-Type": "text/plain" },
+      })
+    })
+    .get("/.env*", ({ set }) => {
+      set.status = 403
+      return new Response("403 - Forbidden: Access to configuration files is not allowed", {
+        status: 403,
+        headers: { "Content-Type": "text/plain" },
+      })
+    })
+    .post("/.env*", ({ set }) => {
+      set.status = 403
+      return new Response("403 - Forbidden: Access to configuration files is not allowed", {
+        status: 403,
+        headers: { "Content-Type": "text/plain" },
+      })
+    })
+    // Block access to package manager files
+    .get("/package*.json", ({ set }) => {
+      set.status = 403
+      return new Response("403 - Forbidden: Access to package files is not allowed", {
+        status: 403,
+        headers: { "Content-Type": "text/plain" },
+      })
+    })
+    .post("/package*.json", ({ set }) => {
+      set.status = 403
+      return new Response("403 - Forbidden: Access to package files is not allowed", {
+        status: 403,
+        headers: { "Content-Type": "text/plain" },
+      })
+    })
+    .get("/bun.lockb", ({ set }) => {
+      set.status = 403
+      return new Response("403 - Forbidden: Access to package files is not allowed", {
+        status: 403,
+        headers: { "Content-Type": "text/plain" },
+      })
+    })
+    .post("/bun.lockb", ({ set }) => {
+      set.status = 403
+      return new Response("403 - Forbidden: Access to package files is not allowed", {
+        status: 403,
+        headers: { "Content-Type": "text/plain" },
+      })
+    })
     .derive(async ({ request, set }) => {
       const start = Date.now()
       const ip = this.getClientIP(request)
