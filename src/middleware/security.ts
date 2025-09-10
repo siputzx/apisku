@@ -67,6 +67,19 @@ export class EndpointRateLimiter {
     const endpoint = new URL(request.url).pathname
     const now = Date.now()
 
+    // Block direct access to sensitive files/directories
+    if (endpoint.startsWith('/router/') || 
+        endpoint.startsWith('/src/') ||
+        endpoint.includes('.env') ||
+        endpoint.startsWith('/.env') ||
+        endpoint.includes('package.json') ||
+        endpoint.includes('bun.lockb')) {
+      set.status = 403
+      set.headers["X-Security-Blocked"] = "true"
+      set.headers["X-Block-Reason"] = "Direct access to sensitive files is not allowed"
+      throw new Error(`Direct access to ${endpoint} is not allowed`)
+    }
+
     if (!this.shouldProtectEndpoint(endpoint)) {
       return true
     }

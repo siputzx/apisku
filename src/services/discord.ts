@@ -71,7 +71,7 @@ export class DiscordService {
       },
     ]
 
-    this.client.on("ready", async () => {
+    this.client.on("clientReady", async () => {
       try {
         await this.client.application?.commands.set(commands)
         this.logger.success("Slash commands registered")
@@ -79,6 +79,7 @@ export class DiscordService {
         this.logger.error("Failed to register commands:", error)
       }
     })
+    
   }
 
   private isAdmin(member: any): boolean {
@@ -89,7 +90,7 @@ export class DiscordService {
   }
 
   private setupEvents(): void {
-    this.client.on("ready", () => {
+    this.client.on("clientReady", () => {
       this.isReady = true
       this.reconnectAttempts = 0
       this.logger.success(`Discord bot ready: ${this.client.user?.tag}`)

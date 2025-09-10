@@ -74,10 +74,14 @@ export function createDonationRoutes(emailService: EmailService, discordService:
           token: transaction.token,
           orderId,
         }
-      } catch (error) {
+      } catch (error: any) {
+        // Log the actual error for debugging but don't expose it to the client
+        console.error("Midtrans transaction error:", error)
+        
+        // Return a generic error message to prevent exposing sensitive information
         return {
           status: false,
-          error: "Gagal membuat transaksi donasi",
+          error: "Gagal membuat transaksi donasi. Silakan coba lagi nanti.",
         }
       }
     })
@@ -118,7 +122,10 @@ export function createDonationRoutes(emailService: EmailService, discordService:
         }
 
         return new Response("OK", { status: 200 })
-      } catch (error) {
+      } catch (error: any) {
+        // Log the actual error for debugging but don't expose it to the client
+        console.error("Donation notification error:", error)
+        
         return new Response("Internal Server Error", { status: 500 })
       }
     })
@@ -130,10 +137,13 @@ export function createDonationRoutes(emailService: EmailService, discordService:
           status: true,
           donations,
         }
-      } catch (error) {
+      } catch (error: any) {
+        // Log the actual error for debugging but don't expose it to the client
+        console.error("Donation list error:", error)
+        
         return {
           status: false,
-          error: "Gagal mengambil daftar donasi",
+          error: "Gagal mengambil daftar donasi. Silakan coba lagi nanti.",
         }
       }
     })
