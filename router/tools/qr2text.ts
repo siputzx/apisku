@@ -3,7 +3,7 @@ import jsQR from "jsqr"
 import { createCanvas, loadImage } from "canvas"
 import { Buffer } from "buffer"
 
-async function readQrCodeFromUrl(url: string) {
+export async function readQrCodeFromUrl(url: string) {
   try {
     const response = await axios({
       method: "get",
@@ -33,6 +33,11 @@ async function readQrCodeFromUrl(url: string) {
     }
     return code.data
   } catch (error: any) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(
+        `Failed to fetch image. Status: ${error.response.status} ${error.response.statusText}`,
+      )
+    }
     console.error("QR Code API Error:", error.message)
     throw new Error(`Failed to read QR code from URL: ${error.message}`)
   }
