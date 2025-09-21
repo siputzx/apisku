@@ -23,6 +23,20 @@ class TikTokScraper {
     return url;
   }
 
+  private decodeJWT(token: string): any {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+      this.log("JWT decode error:", error);
+      return null;
+    }
+  }
+
   private async getInitialCookies() {
     const jar = new CookieJar();
     const client = wrapper(axios.create({ jar, withCredentials: true }));
@@ -47,13 +61,13 @@ class TikTokScraper {
     try {
       this.log("Fetching download links for URL:", URL);
 
-      const response = await axios.get("https://musidown.com/en", {
+      const response = await axios.get("https://musicaldown.com/en", {
         headers: {
           "user-agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36",
           accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
           "accept-language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
           "cache-control": "max-age=0",
-          referer: "https://musidown.com/download",
+          referer: "https://musicaldown.com/download",
           "sec-ch-ua": '"Not A(Brand";v="8", "Chromium";v="132"',
           "sec-ch-ua-mobile": "?1",
           "sec-ch-ua-platform": '"Android"',
@@ -72,7 +86,7 @@ class TikTokScraper {
       const verify = $("#submit-form > div").find("div:nth-child(1) > input[type=hidden]:nth-child(3)").attr("value");
 
       if (!url_name || !token_name || !token_ || !verify) {
-        throw new Error("Failed to extract form data from musidown.com");
+        throw new Error("Failed to extract form data from musicaldown.com");
       }
 
       const data: { [key: string]: string } = {
@@ -84,7 +98,7 @@ class TikTokScraper {
       this.log("Form data prepared:", data);
 
       const respon = await axios.request({
-        url: "https://musidown.com/download",
+        url: "https://musicaldown.com/download",
         method: "post",
         data: new URLSearchParams(Object.entries(data)),
         headers: {
@@ -93,8 +107,8 @@ class TikTokScraper {
           "accept-language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
           "cache-control": "max-age=0",
           "content-type": "application/x-www-form-urlencoded",
-          origin: "https://musidown.com",
-          referer: "https://musidown.com/en",
+          origin: "https://musicaldown.com",
+          referer: "https://musicaldown.com/en",
           "sec-ch-ua": '"Not A(Brand";v="8", "Chromium";v="132"',
           "sec-ch-ua-mobile": "?1",
           "sec-ch-ua-platform": '"Android"',
@@ -107,205 +121,104 @@ class TikTokScraper {
         },
       });
 
-      // Save response for debugging
-      fs.writeFile("output.txt", respon.data, "utf8", (err) => {
-        if (err) {
-          console.error("Gagal menyimpan file:", err);
-        } else {
-          console.log("File berhasil disimpan!");
-        }
-      });
-
       const ch = cheerio.load(respon.data);
-      const downloadLinks: string[] = [];
-
-      ch("a.btn.waves-effect.waves-light.orange.download").each((i, elem) => {
-        const href = ch(elem).attr("href");
-        if (href) downloadLinks.push(href);
-      });
-
-      this.log("Download links found:", downloadLinks);
-
       let result: { video?: string[], audio?: string, photo?: string[] } = {};
 
-      // Handle MP3 download
-      const mp3Form = ch("form[action='/mp3/download']");
-      if (mp3Form.length > 0) {
-        const mp3Res = await axios.request({
-          url: "https://musidown.com/mp3/download",
-          method: "post",
-          data: new URLSearchParams(Object.entries(data)),
-          headers: {
-            "user-agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36",
-            accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-            "accept-language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
-            "content-type": "application/x-www-form-urlencoded",
-            origin: "https://musidown.com",
-            referer: "https://musidown.com/download",
-            "sec-ch-ua": '"Not A(Brand";v="8", "Chromium";v="132"',
-            "sec-ch-ua-mobile": "?1",
-            "sec-ch-ua-platform": '"Android"',
-            "sec-fetch-dest": "document",
-            "sec-fetch-mode": "navigate",
-            "sec-fetch-site": "same-origin",
-            "sec-fetch-user": "?1",
-            "upgrade-insecure-requests": "1",
-            cookie: response.headers["set-cookie"]?.join("; "),
-          },
-        });
-        const mp3Ch = cheerio.load(mp3Res.data);
-        const mp3Link = mp3Ch("a.btn.waves-effect.waves-light.orange.download").attr("href");
-        result.audio = mp3Link ? await this.shortener(mp3Link) : " ";
+      const hdLink = ch('a[data-event="hd_download_click"]').attr("href");
+      const mp4Link = ch('a[data-event="mp4_download_click"]').attr("href");
+      const watermarkLink = ch('a[data-event="watermark_download_click"]').attr("href");
+      const mp3Link = ch('a[data-event="mp3_download_click"]').attr("href");
+
+      this.log("Found links:", { hdLink, mp4Link, watermarkLink, mp3Link });
+
+      const videoLinks = [];
+      if (hdLink && hdLink.includes('token=')) {
+        const token = hdLink.split('token=')[1];
+        const decoded = this.decodeJWT(token);
+        if (decoded && decoded.url) {
+          videoLinks.push(await this.shortener(decoded.url));
+          this.log("HD video URL decoded:", decoded.url);
+        }
       }
 
-      // Handle photo/video download
-      if (respon.status === 302 || ch("button#SlideButton").length > 0) {
-        const photoRes = await axios.request({
-          url: "https://musidown.com/photo/download",
-          method: "post",
-          data: new URLSearchParams(Object.entries(data)),
-          headers: {
-            "user-agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36",
-            accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-            "accept-language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
-            "content-type": "application/x-www-form-urlencoded",
-            origin: "https://musidown.com",
-            referer: "https://musidown.com/download",
-            "sec-ch-ua": '"Not A(Brand";v="8", "Chromium";v="132"',
-            "sec-ch-ua-mobile": "?1",
-            "sec-ch-ua-platform": '"Android"',
-            "sec-fetch-dest": "document",
-            "sec-fetch-mode": "navigate",
-            "sec-fetch-site": "same-origin",
-            "sec-fetch-user": "?1",
-            "upgrade-insecure-requests": "1",
-            cookie: response.headers["set-cookie"]?.join("; "),
-          },
-        });
-
-        const ph = cheerio.load(photoRes.data);
-        const images: string[] = [];
-        ph("div.card-action.center > a").each((i, elem) => {
-          const href = ph(elem).attr("href");
-          if (href) images.push(href);
-        });
-        result.photo = images.length > 0 ? await Promise.all(images.map((img) => this.shortener(img))) : [];
-
-        const mp3Link = ph("a.btn.waves-effect.waves-light.orange.download[data-event='mp3_download_click']").attr("href");
-        if (mp3Link) {
-          result.audio = await this.shortener(mp3Link);
+      if (mp4Link && mp4Link.includes('token=')) {
+        const token = mp4Link.split('token=')[1];
+        const decoded = this.decodeJWT(token);
+        if (decoded && decoded.url) {
+          videoLinks.push(await this.shortener(decoded.url));
+          this.log("MP4 video URL decoded:", decoded.url);
         }
+      }
 
-        const slideButton = ph("#SlideButton");
-        if (slideButton.length > 0) {
-          const slideRes = await axios.request({
-            url: "https://rendercdn.muscdn.app/slidermd",
-            method: "post",
-            data: {
-              data: ph("#SlideButton").attr("data-event") === "video_convert_click"
-                ? ph("#SlideButton").parent().find("script").text().match(/data: '([^']+)'/)?.[1]
-                : "",
-            },
-            headers: {
-              "user-agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36",
-              accept: "application/json",
-              "content-type": "application/x-www-form-urlencoded",
-              origin: "https://musidown.com",
-              referer: "https://musidown.com/photo/download",
-              "sec-ch-ua": '"Not A(Brand";v="8", "Chromium";v="132"',
-              "sec-ch-ua-mobile": "?1",
-              "sec-ch-ua-platform": '"Android"',
-              "sec-fetch-dest": "empty",
-              "sec-fetch-mode": "cors",
-              "sec-fetch-site": "cross-site",
-              cookie: response.headers["set-cookie"]?.join("; "),
-            },
-          });
-          if (slideRes.data.success) {
-            result.video = [await this.shortener(slideRes.data.url)];
+      if (watermarkLink && watermarkLink.includes('token=')) {
+        const token = watermarkLink.split('token=')[1];
+        const decoded = this.decodeJWT(token);
+        if (decoded && decoded.url) {
+          videoLinks.push(await this.shortener(decoded.url));
+          this.log("Watermark video URL decoded:", decoded.url);
+        }
+      }
+
+      result.video = videoLinks.length > 0 ? videoLinks : [];
+
+      if (mp3Link && mp3Link.includes('token=')) {
+        const token = mp3Link.split('token=')[1];
+        const decoded = this.decodeJWT(token);
+        if (decoded && decoded.url) {
+          result.audio = await this.shortener(decoded.url);
+          this.log("MP3 audio URL decoded:", decoded.url);
+        }
+      }
+
+      const images: string[] = [];
+      ch(".card-action.center > a").each((i, elem) => {
+        const href = ch(elem).attr("href");
+        if (href && href.includes('token=')) {
+          const token = href.split('token=')[1];
+          const decoded = this.decodeJWT(token);
+          if (decoded && decoded.cover) {
+            images.push(decoded.cover);
           }
         }
-      } else {
-        result.video = await Promise.all(downloadLinks.map((link) => this.shortener(link)));
+      });
+
+      if (images.length > 0) {
+        result.photo = await Promise.all(images.map((img) => this.shortener(img)));
       }
 
-      this.log("Result:", result);
+      const slideButton = ch("#SlideButton");
+      if (slideButton.length > 0) {
+        try {
+          const scriptContent = ch("#SlideButton").parent().find("script").text();
+          const slideDataMatch = scriptContent.match(/data:\s*['"](.*?)['"]/);
+          if (slideDataMatch) {
+            const slideData = slideDataMatch[1];
+            const slideRes = await axios.request({
+              url: "https://render.muscdn.app/slider",
+              method: "post",
+              data: new URLSearchParams({ data: slideData }),
+              headers: {
+                "user-agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36",
+                accept: "application/json",
+                "content-type": "application/x-www-form-urlencoded",
+                origin: "https://musicaldown.com",
+                referer: "https://musicaldown.com/photo/download",
+              },
+            });
+            
+            if (slideRes.data.success) {
+              result.video = [await this.shortener(slideRes.data.url)];
+            }
+          }
+        } catch (slideError) {
+          this.log("Slideshow conversion error:", slideError);
+        }
+      }
+
+      this.log("Download links result:", result);
       return result;
 
     } catch (err: any) {
-      if (err.response && err.response.status === 302) {
-        const photoRes = await axios.request({
-          url: "https://musidown.com/photo/download",
-          method: "post",
-          data: new URLSearchParams(Object.entries(data)),
-          headers: {
-            "user-agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36",
-            accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-            "accept-language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
-            "content-type": "application/x-www-form-urlencoded",
-            origin: "https://musidown.com",
-            referer: "https://musidown.com/download",
-            "sec-ch-ua": '"Not A(Brand";v="8", "Chromium";v="132"',
-            "sec-ch-ua-mobile": "?1",
-            "sec-ch-ua-platform": '"Android"',
-            "sec-fetch-dest": "document",
-            "sec-fetch-mode": "navigate",
-            "sec-fetch-site": "same-origin",
-            "sec-fetch-user": "?1",
-            "upgrade-insecure-requests": "1",
-            cookie: err.response.headers["set-cookie"]?.join("; "),
-          },
-        });
-
-        const ph = cheerio.load(photoRes.data);
-        const images: string[] = [];
-        ph("div.card-action.center > a").each((i, elem) => {
-          const href = ph(elem).attr("href");
-          if (href) images.push(href);
-        });
-        const result: { video?: string[], audio?: string, photo?: string[] } = {
-          photo: images.length > 0 ? await Promise.all(images.map((img) => this.shortener(img))) : [],
-        };
-
-        const mp3Link = ph("a.btn.waves-effect.waves-light.orange.download[data-event='mp3_download_click']").attr("href");
-        if (mp3Link) {
-          result.audio = await this.shortener(mp3Link);
-        }
-
-        const slideButton = ph("#SlideButton");
-        if (slideButton.length > 0) {
-          const slideRes = await axios.request({
-            url: "https://rendercdn.muscdn.app/slidermd",
-            method: "post",
-            data: {
-              data: ph("#SlideButton").attr("data-event") === "video_convert_click"
-                ? ph("#SlideButton").parent().find("script").text().match(/data: '([^']+)'/)?.[1]
-                : "",
-            },
-            headers: {
-              "user-agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36",
-              accept: "application/json",
-              "content-type": "application/x-www-form-urlencoded",
-              origin: "https://musidown.com",
-              referer: "https://musidown.com/photo/download",
-              "sec-ch-ua": '"Not A(Brand";v="8", "Chromium";v="132"',
-              "sec-ch-ua-mobile": "?1",
-              "sec-ch-ua-platform": '"Android"',
-              "sec-fetch-dest": "empty",
-              "sec-fetch-mode": "cors",
-              "sec-fetch-site": "cross-site",
-              cookie: err.response.headers["set-cookie"]?.join("; "),
-            },
-          });
-          if (slideRes.data.success) {
-            result.video = [await this.shortener(slideRes.data.url)];
-          }
-        }
-
-        this.log("Redirect photo result:", result);
-        return result;
-      }
-
       this.log("Error in getDownloadLinks:", err.message);
       throw err;
     }
