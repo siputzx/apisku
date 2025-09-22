@@ -116,91 +116,75 @@ export class BypassService {
 
   async wafSession(url: string, proxy?: ProxyConfig, timeout = 60000): Promise<BypassResult> {
     const startTime = Date.now()
-    let context: any = null
-    let page: any = null
-
     try {
       if (!url) {
         throw new Error("Missing url parameter")
       }
 
-      context = await this.browserService.createContext({
-        proxyServer: proxy ? `http://${proxy.host}:${proxy.port}` : undefined,
-      })
+      const result = await this.browserService.withBrowserContext(async (context: any) => {
+        const page = await context.newPage()
+        await page.setDefaultTimeout(30000)
+        await page.setDefaultNavigationTimeout(30000)
 
-      page = await context.newPage()
-      await page.setDefaultTimeout(30000)
-      await page.setDefaultNavigationTimeout(30000)
+        if (proxy?.username && proxy?.password) {
+          await page.authenticate({
+            username: proxy.username,
+            password: proxy.password,
+          })
+        }
 
-      if (proxy?.username && proxy?.password) {
-        await page.authenticate({
-          username: proxy.username,
-          password: proxy.password,
-        })
-      }
+        const acceptLanguage = await this.findAcceptLanguage(page)
+        await page.setRequestInterception(true)
 
-      // Find accept language
-      const acceptLanguage = await this.findAcceptLanguage(page)
-      await page.setRequestInterception(true)
-
-      let resolved = false
-      const result = await new Promise<WafSessionResult>((resolve, reject) => {
-        const timeoutHandler = setTimeout(() => {
-          if (!resolved) {
-            resolved = true
-            reject(new Error("Timeout Error"))
-          }
-        }, timeout)
-
-        page.on("request", async (request: any) => {
-          try {
-            await request.continue()
-          } catch (e) {
-            // Request might already be handled
-          }
-        })
-
-        page.on("response", async (res: any) => {
-          try {
-            if (!resolved && [200, 302].includes(res.status()) && [url, url + "/"].includes(res.url())) {
-              await page.waitForNavigation({ waitUntil: "load", timeout: 5000 }).catch(() => {})
-
-              const cookies = await page.cookies()
-              const headers = await res.request().headers()
-
-              // Clean headers
-              delete headers["content-type"]
-              delete headers["accept-encoding"]
-              delete headers["accept"]
-              delete headers["content-length"]
-              headers["accept-language"] = acceptLanguage
-
-              resolved = true
-              clearTimeout(timeoutHandler)
-              resolve({ cookies, headers })
-            }
-          } catch (error: any) {
+        let resolved = false
+        return new Promise<WafSessionResult>((resolve, reject) => {
+          const timeoutHandler = setTimeout(() => {
             if (!resolved) {
               resolved = true
-              clearTimeout(timeoutHandler)
-              reject(error)
+              reject(new Error("Timeout Error"))
             }
-          }
-        })
+          }, timeout)
 
-        // Navigate to URL
-        page
-          .goto(url, {
-            waitUntil: "domcontentloaded",
-            timeout: 30000,
+          page.on("request", async (request: any) => {
+            try {
+              await request.continue()
+            } catch (e) {
+              // Request might already be handled
+            }
           })
-          .catch((error: any) => {
+
+          page.on("response", async (res: any) => {
+            try {
+              if (!resolved && [200, 302].includes(res.status()) && [url, url + "/"].includes(res.url())) {
+                await page.waitForNavigation({ waitUntil: "load", timeout: 5000 }).catch(() => {})
+                const cookies = await page.cookies()
+                const headers = await res.request().headers()
+                delete headers["content-type"]
+                delete headers["accept-encoding"]
+                delete headers["accept"]
+                delete headers["content-length"]
+                headers["accept-language"] = acceptLanguage
+                resolved = true
+                clearTimeout(timeoutHandler)
+                resolve({ cookies, headers })
+              }
+            } catch (error: any) {
+              if (!resolved) {
+                resolved = true
+                clearTimeout(timeoutHandler)
+                reject(error)
+              }
+            }
+          })
+
+          page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 }).catch((error: any) => {
             if (!resolved) {
               resolved = true
               clearTimeout(timeoutHandler)
               reject(error)
             }
           })
+        })
       })
 
       return {
@@ -215,43 +199,17 @@ export class BypassService {
         error: error.message || "Unknown error",
         duration: Date.now() - startTime,
       }
-    } finally {
-      await this.cleanup(page, context)
     }
   }
 
   async solveTurnstileMin(url: string, siteKey: string, proxy?: ProxyConfig, timeout = 60000): Promise<BypassResult> {
     const startTime = Date.now()
-    let context: any = null
-    let contextClosed = false
-
     try {
       if (!url || !siteKey) {
         throw new Error("Missing url or siteKey parameter")
       }
 
-      context = await this.browserService.createContext({
-        proxyServer: proxy ? `http://${proxy.host}:${proxy.port}` : undefined,
-      })
-
-      if (!context) {
-        throw new Error("Failed to create browser context")
-      }
-
-      let isResolved = false
-
-      const timeoutHandler = setTimeout(async () => {
-        if (!isResolved && !contextClosed) {
-          try {
-            contextClosed = true
-            await context.close()
-          } catch (err: any) {
-            this.logger.error("Error closing context on timeout:", err.message)
-          }
-        }
-      }, timeout)
-
-      try {
+      const token = await this.browserService.withBrowserContext(async (context: any) => {
         const page = await context.newPage()
 
         if (proxy?.username && proxy?.password) {
@@ -283,49 +241,23 @@ export class BypassService {
           timeout: timeout,
         })
 
-        const token = await page.evaluate(() => {
+        return page.evaluate(() => {
           try {
             return (document.querySelector('[name="cf-response"]') as HTMLInputElement)?.value
           } catch (e) {
             return null
           }
         })
+      })
 
-        isResolved = true
-        clearTimeout(timeoutHandler)
+      if (!token || token.length < 10) {
+        throw new Error("Failed to get token")
+      }
 
-        if (!contextClosed) {
-          try {
-            contextClosed = true
-            await context.close()
-          } catch (err: any) {
-            this.logger.error("Error closing context after completion:", err.message)
-          }
-        }
-
-        if (!token || token.length < 10) {
-          throw new Error("Failed to get token")
-        }
-
-        return {
-          success: true,
-          data: token,
-          duration: Date.now() - startTime,
-        }
-      } catch (err: any) {
-        isResolved = true
-        clearTimeout(timeoutHandler)
-
-        if (!contextClosed) {
-          try {
-            contextClosed = true
-            await context.close()
-          } catch (closeErr: any) {
-            this.logger.error("Error closing context after error:", closeErr.message)
-          }
-        }
-
-        throw err
+      return {
+        success: true,
+        data: token,
+        duration: Date.now() - startTime,
       }
     } catch (error: any) {
       this.logger.error("Turnstile min solve error:", error)
@@ -339,60 +271,55 @@ export class BypassService {
 
   async solveTurnstileMax(url: string, proxy?: ProxyConfig, timeout = 60000): Promise<BypassResult> {
     const startTime = Date.now()
-    let context: any = null
-    let page: any = null
-
     try {
       if (!url) {
         throw new Error("Missing url parameter")
       }
 
-      context = await this.browserService.createContext({
-        proxyServer: proxy ? `http://${proxy.host}:${proxy.port}` : undefined,
-      })
+      const token = await this.browserService.withBrowserContext(async (context: any) => {
+        const page = await context.newPage()
+        await page.setDefaultTimeout(30000)
+        await page.setDefaultNavigationTimeout(30000)
 
-      page = await context.newPage()
-      await page.setDefaultTimeout(30000)
-      await page.setDefaultNavigationTimeout(30000)
+        if (proxy?.username && proxy?.password) {
+          await page.authenticate({
+            username: proxy.username,
+            password: proxy.password,
+          })
+        }
 
-      if (proxy?.username && proxy?.password) {
-        await page.authenticate({
-          username: proxy.username,
-          password: proxy.password,
-        })
-      }
-
-      await page.evaluateOnNewDocument(() => {
-        let token: string | null = null
-        async function waitForToken(): Promise<void> {
-          while (!token) {
-            try {
-              token = (window as any).turnstile.getResponse()
-            } catch (e) {}
-            await new Promise((resolve) => setTimeout(resolve, 500))
+        await page.evaluateOnNewDocument(() => {
+          let token: string | null = null
+          async function waitForToken(): Promise<void> {
+            while (!token) {
+              try {
+                token = (window as any).turnstile.getResponse()
+              } catch (e) {}
+              await new Promise((resolve) => setTimeout(resolve, 500))
+            }
+            const c = document.createElement("input")
+            c.type = "hidden"
+            c.name = "cf-response"
+            c.value = token
+            document.body.appendChild(c)
           }
-          const c = document.createElement("input")
-          c.type = "hidden"
-          c.name = "cf-response"
-          c.value = token
-          document.body.appendChild(c)
-        }
-        waitForToken()
-      })
+          waitForToken()
+        })
 
-      await page.goto(url, {
-        waitUntil: "domcontentloaded",
-        timeout: 30000,
-      })
+        await page.goto(url, {
+          waitUntil: "domcontentloaded",
+          timeout: 30000,
+        })
 
-      await page.waitForSelector('[name="cf-response"]', { timeout })
+        await page.waitForSelector('[name="cf-response"]', { timeout })
 
-      const token = await page.evaluate(() => {
-        try {
-          return (document.querySelector('[name="cf-response"]') as HTMLInputElement)?.value
-        } catch (e) {
-          return null
-        }
+        return page.evaluate(() => {
+          try {
+            return (document.querySelector('[name="cf-response"]') as HTMLInputElement)?.value
+          } catch (e) {
+            return null
+          }
+        })
       })
 
       if (!token || token.length < 10) {
@@ -411,87 +338,73 @@ export class BypassService {
         error: error.message || "Unknown error",
         duration: Date.now() - startTime,
       }
-    } finally {
-      await this.cleanup(page, context)
     }
   }
 
   async getSource(url: string, proxy?: ProxyConfig, timeout = 60000): Promise<BypassResult> {
     const startTime = Date.now()
-    let context: any = null
-    let page: any = null
-
     try {
       if (!url) {
         throw new Error("Missing url parameter")
       }
 
-      context = await this.browserService.createContext({
-        proxyServer: proxy ? `http://${proxy.host}:${proxy.port}` : undefined,
-      })
+      const result = await this.browserService.withBrowserContext(async (context: any) => {
+        const page = await context.newPage()
+        await page.setDefaultTimeout(30000)
+        await page.setDefaultNavigationTimeout(30000)
 
-      page = await context.newPage()
-      await page.setDefaultTimeout(30000)
-      await page.setDefaultNavigationTimeout(30000)
+        if (proxy?.username && proxy?.password) {
+          await page.authenticate({
+            username: proxy.username,
+            password: proxy.password,
+          })
+        }
 
-      if (proxy?.username && proxy?.password) {
-        await page.authenticate({
-          username: proxy.username,
-          password: proxy.password,
-        })
-      }
+        await page.setRequestInterception(true)
 
-      await page.setRequestInterception(true)
-
-      let resolved = false
-      const result = await new Promise<string>((resolve, reject) => {
-        const timeoutHandler = setTimeout(() => {
-          if (!resolved) {
-            resolved = true
-            reject(new Error("Timeout Error"))
-          }
-        }, timeout)
-
-        page.on("request", async (request: any) => {
-          try {
-            await request.continue()
-          } catch (e) {
-            // Request might already be handled
-          }
-        })
-
-        page.on("response", async (res: any) => {
-          try {
-            if (!resolved && [200, 302].includes(res.status()) && [url, url + "/"].includes(res.url())) {
-              await page.waitForNavigation({ waitUntil: "load", timeout: 5000 }).catch(() => {})
-              const html = await page.content()
-
-              resolved = true
-              clearTimeout(timeoutHandler)
-              resolve(html)
-            }
-          } catch (error: any) {
+        let resolved = false
+        return new Promise<string>((resolve, reject) => {
+          const timeoutHandler = setTimeout(() => {
             if (!resolved) {
               resolved = true
-              clearTimeout(timeoutHandler)
-              reject(error)
+              reject(new Error("Timeout Error"))
             }
-          }
-        })
+          }, timeout)
 
-        // Navigate to URL
-        page
-          .goto(url, {
-            waitUntil: "domcontentloaded",
-            timeout: 30000,
+          page.on("request", async (request: any) => {
+            try {
+              await request.continue()
+            } catch (e) {
+              // Request might already be handled
+            }
           })
-          .catch((error: any) => {
+
+          page.on("response", async (res: any) => {
+            try {
+              if (!resolved && [200, 302].includes(res.status()) && [url, url + "/"].includes(res.url())) {
+                await page.waitForNavigation({ waitUntil: "load", timeout: 5000 }).catch(() => {})
+                const html = await page.content()
+                resolved = true
+                clearTimeout(timeoutHandler)
+                resolve(html)
+              }
+            } catch (error: any) {
+              if (!resolved) {
+                resolved = true
+                clearTimeout(timeoutHandler)
+                reject(error)
+              }
+            }
+          })
+
+          page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 }).catch((error: any) => {
             if (!resolved) {
               resolved = true
               clearTimeout(timeoutHandler)
               reject(error)
             }
           })
+        })
       })
 
       return {
@@ -506,8 +419,6 @@ export class BypassService {
         error: error.message || "Unknown error",
         duration: Date.now() - startTime,
       }
-    } finally {
-      await this.cleanup(page, context)
     }
   }
 
@@ -525,18 +436,6 @@ export class BypassService {
     }
   }
 
-  private async cleanup(page: any, context: any): Promise<void> {
-    try {
-      if (page) {
-        await page.close().catch(() => {})
-      }
-      if (context) {
-        await context.close().catch(() => {})
-      }
-    } catch (error: any) {
-      this.logger.debug("Cleanup error:", error.message)
-    }
-  }
 
   getStats() {
     return this.browserService.getBrowserStats()

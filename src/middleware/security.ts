@@ -28,34 +28,16 @@ export class EndpointRateLimiter {
 
   constructor(config: SecurityConfig) {
     this.config = config
-    this.startCleanup()
-  }
-
-  private startCleanup(): void {
+    // A less frequent cleanup for non-blocked, inactive records to prevent memory leaks.
     this.cleanupInterval = setInterval(() => {
       const now = Date.now()
-      
-      for (const [endpoint, record] of this.endpointRecords) {
-        if (record.isBlocked && now > record.blockedUntil && record.cooldownStart <= now - this.config.rateLimiting.cooldownMs) {
-          record.isBlocked = false
-          record.blockedUntil = 0
-          record.count = 0
-          record.burstCount = 0
-          record.resetTime = now + this.config.rateLimiting.windowMs
-          record.cooldownStart = 0
-        }
-
-        if (!record.isBlocked && now > record.resetTime) {
-          record.count = 0
-          record.burstCount = 0
-          record.resetTime = now + this.config.rateLimiting.windowMs
-        }
-
-        if (!record.isBlocked && record.count === 0 && record.totalRequests === 0) {
+      for (const [endpoint, record] of this.endpointRecords.entries()) {
+        // Remove old, inactive records that are not blocked.
+        if (!record.isBlocked && now > record.lastRequestTime + (this.config.rateLimiting.windowMs * 5)) {
           this.endpointRecords.delete(endpoint)
         }
       }
-    }, 10000)
+    }, 60000) // Run every minute
   }
 
   private shouldProtectEndpoint(endpoint: string): boolean {
@@ -100,58 +82,53 @@ export class EndpointRateLimiter {
       this.endpointRecords.set(endpoint, record)
     }
 
-    if (record.isBlocked) {
-      if (now > record.blockedUntil && record.cooldownStart <= now - this.config.rateLimiting.cooldownMs) {
-        record.isBlocked = false
-        record.blockedUntil = 0
-        record.count = 1
-        record.burstCount = 0
-        record.resetTime = now + this.config.rateLimiting.windowMs
-        record.cooldownStart = 0
-        record.totalRequests++
-        record.lastRequestTime = now
-      } else {
-        const remainingTime = Math.ceil((record.blockedUntil - now) / 1000)
-        set.status = 503
-        set.headers["Retry-After"] = remainingTime.toString()
-        set.headers["X-Endpoint-Blocked"] = "true"
-        set.headers["X-Block-Type"] = "endpoint-cooldown"
-        throw new Error(`Endpoint ${endpoint} is in cooldown`)
-      }
+    if (record.isBlocked && now < record.blockedUntil) {
+      const remainingTime = Math.ceil((record.blockedUntil - now) / 1000)
+      set.status = 503
+      set.headers["Retry-After"] = remainingTime.toString()
+      set.headers["X-Endpoint-Blocked"] = "true"
+      set.headers["X-Block-Type"] = "endpoint-cooldown"
+      throw new Error(`Endpoint ${endpoint} is in cooldown`)
+    }
+
+    if (now > record.resetTime) {
+      record.count = 1
+      record.burstCount = 0
+      record.resetTime = now + this.config.rateLimiting.windowMs
     } else {
-      if (now > record.resetTime) {
-        record.count = 1
-        record.burstCount = 0
-        record.resetTime = now + this.config.rateLimiting.windowMs
+      record.count++
+
+      if (now - record.lastRequestTime < 1000) {
+        record.burstCount++
       } else {
-        record.count++
-        
-        if (now - record.lastRequestTime < 1000) {
-          record.burstCount++
-        } else {
-          record.burstCount = Math.max(0, record.burstCount - 1)
+        record.burstCount = Math.max(0, record.burstCount - 1)
+      }
+    }
+
+    record.totalRequests++
+    record.lastRequestTime = now
+
+    const isBurstAttack = record.burstCount > this.config.rateLimiting.burstThreshold
+    const isOverLimit = record.count > this.config.rateLimiting.maxRequests
+
+    if (isOverLimit || isBurstAttack) {
+      record.isBlocked = true
+      record.blockedUntil = now + this.config.rateLimiting.cooldownMs
+
+      setTimeout(() => {
+        const currentRecord = this.endpointRecords.get(endpoint)
+        if (currentRecord && currentRecord.isBlocked) {
+          this.resetEndpoint(endpoint)
         }
-      }
-      
-      record.totalRequests++
-      record.lastRequestTime = now
+      }, this.config.rateLimiting.cooldownMs)
 
-      const isBurstAttack = record.burstCount > this.config.rateLimiting.burstThreshold
-      const isOverLimit = record.count > this.config.rateLimiting.maxRequests
+      const blockReason = isBurstAttack ? "Burst attack detected" : "Rate limit exceeded"
 
-      if (isOverLimit || isBurstAttack) {
-        record.isBlocked = true
-        record.blockedUntil = record.cooldownStart ? record.cooldownStart + this.config.rateLimiting.cooldownMs : now + this.config.rateLimiting.cooldownMs
-        record.cooldownStart = record.cooldownStart || now
-        
-        const blockReason = isBurstAttack ? "Burst attack detected" : "Rate limit exceeded"
-        
-        set.status = 503
-        set.headers["Retry-After"] = Math.ceil(this.config.rateLimiting.cooldownMs / 1000).toString()
-        set.headers["X-Endpoint-Blocked"] = "true"
-        set.headers["X-Block-Reason"] = blockReason
-        throw new Error(`Endpoint ${endpoint} blocked: ${blockReason}`)
-      }
+      set.status = 503
+      set.headers["Retry-After"] = Math.ceil(this.config.rateLimiting.cooldownMs / 1000).toString()
+      set.headers["X-Endpoint-Blocked"] = "true"
+      set.headers["X-Block-Reason"] = blockReason
+      throw new Error(`Endpoint ${endpoint} blocked: ${blockReason}`)
     }
 
     set.headers["X-RateLimit-Endpoint"] = endpoint
