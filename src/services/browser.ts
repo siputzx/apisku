@@ -282,6 +282,22 @@ export class BrowserService {
     })
   }
 
+  async withBrowserContext<T>(callback: (context: any) => Promise<T>): Promise<T> {
+    let context: any | null = null
+    try {
+      context = await this.createContext()
+      return await callback(context)
+    } finally {
+      if (context) {
+        try {
+          await context.close()
+        } catch (error: any) {
+          this.logger.warn(`Failed to close context: ${error.message}`)
+        }
+      }
+    }
+  }
+
   getBrowserStats(): BrowserStats {
     return { ...this.stats }
   }
